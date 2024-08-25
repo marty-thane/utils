@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# This script wraps around nmcli and is used for managing wireless connections.
+# It saves user's time by shortening the commands. In case of connecting to an
+# unknown network, the script automatically asks for password.
+
+case "$1" in
+	list)
+		nmcli dev wifi list
+		;;
+	scan)
+		nmcli dev wifi list --rescan yes
+		;;
+	connect)
+		if nmcli --get-value NAME conn | grep -q "$2"; then
+			nmcli dev wifi connect "$2"
+		else
+			nmcli --ask dev wifi connect "$2"
+		fi
+		;;
+	disconnect)
+		nmcli con down id "$2"
+		;;
+	on)
+		nmcli radio wifi on
+		;;
+	off)
+		nmcli radio wifi off
+		;;
+	*)
+		echo "$0: unknown command"
+		exit 1
+		;;
+esac

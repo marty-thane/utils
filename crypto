@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# This script wraps around cryptsetup and is used for managing encrypted
+# partitions. Partitions are mounted to /media/<name>. In case of failure, it
+# may be necessary to manually undo any mounts etc. The script assumes doas is
+# used to run it.
+
+set -e
+
+command="$1"
+partition="$2"
+name="${2##*/}"
+
+case "$command" in
+	open)
+		cryptsetup open "$partition" "$name"
+		mkdir /media/"$name"
+		mount /dev/mapper/"$name" /media/"$name"
+		chown $DOAS_USER:$DOAS_USER -R /media/"$name"
+
+		;;
+	close)
+		umount /media/"$name"
+		rmdir /media/"$name"
+		cryptsetup close "$name"
+		;;
+	setup)
+		cryptsetup luksFormat "$partition"
+		;;
+	*)
+		echo "$0: unknown command"
+		exit 1
+		;;
+esac

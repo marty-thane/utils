@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# This script acts as an ad blocker by downloading a blocklist from the
+# internet and symlinking it to /etc/hosts. User then runs the script to toggle
+# the blocking on and off. Root privileges are needed to run this script.
+
+set -e
+
+src='https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts'
+list="/etc/hosts.blocklist"
+
+[ -f $list ] || wget -nv -O $list $src
+
+if [ -f /etc/hosts ]; then
+	rm /etc/hosts
+	echo "$0: disabled"
+else
+	ln -s $list /etc/hosts
+	echo "$0: enabled"
+fi
