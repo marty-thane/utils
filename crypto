@@ -7,11 +7,11 @@
 
 set -e
 
-command="$1"
+verb="$1"
 partition="$2"
 name="${2##*/}"
 
-case "$command" in
+case "$verb" in
 	open)
 		cryptsetup open "$partition" "$name"
 		mkdir /media/"$name"
