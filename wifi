@@ -4,6 +4,8 @@
 # It saves user's time by shortening the commands. In case of connecting to an
 # unknown network, the script automatically asks for password.
 
+set -u
+
 case "$1" in
 	list)
 		nmcli dev wifi list

@@ -5,7 +5,7 @@
 # may be necessary to manually undo any mounts etc. The script assumes doas is
 # used to run it.
 
-set -e
+set -eu
 
 verb="$1"
 partition="$2"
