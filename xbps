@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# This script wraps around XBPS package manager, shortening many often used
+# commands. Syntax is inspired by APT. Root privileges are needed for some
+# verbs.
+
+set -u
+
+case "$1" in
+	update)
+		xbps-install -S
+		;;
+	upgrade)
+		xbps-install -u
+		;;
+	install)
+		xbps-install "${@:2}"
+		;;
+	remove)
+		xbps-remove "${@:2}"
+		;;
+	autoremove)
+		xbps-remove -o
+		;;
+	autoclean)
+		xbps-remove -O
+		;;
+	search)
+		xbps-query -Rs "$2"
+		;;
+	info)
+		xbps-query "$2"
+		;;
+	*)
+		echo "$0: unknown command"
+		exit 1
+		;;
+esac
