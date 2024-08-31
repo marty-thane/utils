@@ -1,9 +1,8 @@
 #!/bin/bash
 
-# This script wraps around cryptsetup and is used for managing encrypted
-# partitions. Partitions are mounted to /media by default. In case of failure,
-# it may be necessary to manually undo any mounts etc. The script assumes doas
-# is used to run it.
+# This script wraps around cryptsetup and is used to manage encrypted
+# partitions. Partitions are mounted to /media. In case of failure, it may be
+# necessary to manually undo any mounts etc.
 
 set -e
 
