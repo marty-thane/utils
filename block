@@ -10,6 +10,7 @@ HOSTS="/etc/hosts"
 HOSTS_BACKUP="/etc/hosts.old"
 BLOCKLIST="/etc/hosts.blocklist"
 BLOCKLIST_SOURCE='https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts'
+# BLOCKLIST_SOURCE='https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts'
 
 # Download blocklist if not available
 [ -f $BLOCKLIST ] ||  {
