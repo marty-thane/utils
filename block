@@ -6,15 +6,28 @@
 
 set -e
 
-src='https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts'
-list="/etc/hosts.blocklist"
+HOSTS="/etc/hosts"
+HOSTS_BACKUP="/etc/hosts.old"
+BLOCKLIST="/etc/hosts.blocklist"
+BLOCKLIST_SOURCE='https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts'
 
-[ -f $list ] || wget -nv -O $list $src
+# Download blocklist if not available
+[ -f $BLOCKLIST ] ||  {
+	echo "Downloading blocklist to '$BLOCKLIST'"
+	curl -s $BLOCKLIST_SOURCE > $BLOCKLIST
+}
 
-if [ -f /etc/hosts ]; then
-	rm /etc/hosts
-	echo "$0: disabled"
+# Backup original hosts file if in place
+[ -f $HOSTS ] && [ ! -L $HOSTS ] && {
+	echo "Moving original '$HOSTS' to '$HOSTS_BACKUP'"
+	mv $HOSTS $HOSTS_BACKUP
+}
+
+# Light switch logic
+if [ -L $HOSTS ]; then
+	rm $HOSTS
+	echo "Removed '$HOSTS'"
 else
-	ln -s $list /etc/hosts
-	echo "$0: enabled"
+	ln -s $BLOCKLIST $HOSTS
+	echo "Symlinked '$BLOCKLIST' to '$HOSTS'"
 fi
