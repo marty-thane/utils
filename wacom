@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# This script maps the first Wacom stylus device found to the primary screen
+# while preserving aspect ratio. It borrows from Tom Galvin's more
+# sophisticated mapwacom, which is available here:
+# https://gist.github.com/tom-galvin/6c19fe907945d735c045
+
+set -e
+
+DEVICE=$(xinput list --name-only | grep -i 'wacom' | grep -i 'stylus')
+SCREEN=$(xrandr | grep 'connected primary' | awk '{print $1}')
+
+if [ -z "$DEVICE" ]; then
+	echo "No Wacom stylus device found" >&2
+	exit 1
+fi
+
+if [ -z "$SCREEN" ]; then
+	echo "Unable to get primary screen" >&2
+	exit 1
+fi
+
+read DEVICE_WIDTH DEVICE_HEIGHT <<< $(xinput list-props "$DEVICE" |
+	grep -i 'Wacom Tablet Area' | awk -F ', ' '{print $3, $4}')
+
+read SCREEN_WIDTH SCREEN_HEIGHT <<< $(xrandr | grep "$SCREEN" |
+	awk '{print $4}' | awk -F '[x+]' '{print $1, $2}')
+
+SCALED_DEVICE_HEIGHT=$(( DEVICE_WIDTH * SCREEN_HEIGHT / SCREEN_WIDTH ))
+SCALED_DEVICE_WIDTH=$(( DEVICE_HEIGHT * SCREEN_WIDTH / SCREEN_HEIGHT ))
+
+if [ "$DEVICE_HEIGHT" -gt "$SCALED_DEVICE_HEIGHT" ]; then
+	NEW_DEVICE_WIDTH="$DEVICE_WIDTH"
+	NEW_DEVICE_HEIGHT="$SCALED_DEVICE_HEIGHT"
+else
+	NEW_DEVICE_WIDTH="$SCALED_DEVICE_WIDTH"
+	NEW_DEVICE_HEIGHT="$DEVICE_HEIGHT"
+fi
+
+if [ "$1" = '-L' ]; then
+	xsetwacom --set "$DEVICE" Rotate half
+	echo "$DEVICE rotated by half"
+fi
+
+xsetwacom --set "$DEVICE" Area 0 0 "$NEW_DEVICE_WIDTH" "$NEW_DEVICE_HEIGHT"
+xsetwacom --set "$DEVICE" MapToOutput "$SCREEN"
+
+echo "$DEVICE mapped to $SCREEN"
