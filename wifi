@@ -4,7 +4,28 @@
 # It saves user's time by shortening the commands. In case of connecting to an
 # unknown network, the script automatically asks for password.
 
-set -u
+WIFI="$(basename $0)"
+VERB="$1"
+ARG="$2"
+
+print_help() {
+	echo "Usage: $WIFI VERB [ARG]"
+	echo
+	echo "Verbs:"
+	echo "  list            - list available networks"
+	echo "  scan            - same as list, but refresh first"
+	echo "  connect SSID    - connect to a network (asks for password if necessary)"
+	echo "  disconnect SSID - disconnect from a network"
+	echo "  on              - turn the wireless radio on"
+	echo "  off             - turn the wireless radio off"
+}
+
+check_ssid() {
+	[ "$ARG" ] || {
+		echo "No SSID provided" 
+		exit 1
+	}
+}
 
 case "$1" in
 	list)
@@ -14,6 +35,7 @@ case "$1" in
 		nmcli dev wifi list --rescan yes
 		;;
 	connect)
+		check_ssid
 		if nmcli --get-value NAME conn | grep -q "$2"; then
 			nmcli dev wifi connect "$2"
 		else
@@ -21,6 +43,7 @@ case "$1" in
 		fi
 		;;
 	disconnect)
+		check_ssid
 		nmcli con down id "$2"
 		;;
 	on)
@@ -30,7 +53,7 @@ case "$1" in
 		nmcli radio wifi off
 		;;
 	*)
-		echo "$0: unknown command"
+		print_help
 		exit 1
 		;;
 esac

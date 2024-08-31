@@ -6,6 +6,22 @@
 
 set -u
 
+XBPS="$(basename $0)"
+
+print_help() {
+	echo "Usage: $XBPS VERB [ARG]"
+	echo
+	echo "Verbs:"
+	echo "  update      upgrade    install  remove"
+	echo "  autoremove  autoclean  search   info"
+	echo
+	echo "Args:"
+	echo "  install PKG..."
+	echo "  remove PKG..."
+	echo "  search PKG"
+	echo "  info PKG"
+}
+
 case "$1" in
 	update)
 		xbps-install -S
@@ -32,7 +48,7 @@ case "$1" in
 		xbps-query "$2"
 		;;
 	*)
-		echo "$0: unknown command"
+		print_help
 		exit 1
 		;;
 esac
