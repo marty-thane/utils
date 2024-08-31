@@ -1,34 +1,84 @@
 #!/bin/bash
 
 # This script wraps around cryptsetup and is used for managing encrypted
-# partitions. Partitions are mounted to /media/<name>. In case of failure, it
-# may be necessary to manually undo any mounts etc. The script assumes doas is
-# used to run it.
+# partitions. Partitions are mounted to /media by default. In case of failure,
+# it may be necessary to manually undo any mounts etc. The script assumes doas
+# is used to run it.
 
-set -eu
+set -e
 
-verb="$1"
-partition="$2"
-name="${2##*/}"
+CRYPT="$(basename $0)"
 
-case "$verb" in
-	open)
-		cryptsetup open "$partition" "$name"
-		mkdir /media/"$name"
-		mount /dev/mapper/"$name" /media/"$name"
-		chown $DOAS_USER:$DOAS_USER -R /media/"$name"
+DESTINATION='/media'
 
-		;;
-	close)
-		umount /media/"$name"
-		rmdir /media/"$name"
-		cryptsetup close "$name"
-		;;
-	setup)
-		cryptsetup luksFormat "$partition"
-		;;
-	*)
-		echo "$0: unknown command"
-		exit 1
-		;;
+VERB="$1"
+PARTITION="$2"
+
+print_help() {
+	echo "Usage: $CRYPT VERB PARTITION"
+	echo ""
+	echo "Verbs:"
+	echo "  open   mount PARTITION to $DESTINATION/<label>"
+	echo "  close  unmount PARTITION previously mounted"
+	echo "  setup  run cryptsetup luksFormat on PARTITION"
+	echo ""
+	echo "Root privileges are needed to run this script."
+	echo "Both sudo and doas are supported."
+}
+
+get_label() {
+	echo "${1##*/}-crypto"
+}
+
+open() {
+	local partition="$1"
+	local label="$(get_label $1)"
+
+	cryptsetup open "$partition" "$label"
+
+	mkdir "$DESTINATION/$label"
+	mount -v "/dev/mapper/$label" "$DESTINATION/$label"
+
+	if [ "$SUDO_USER" ]; then
+		local user="$SUDO_USER"
+	elif [ "$DOAS_USER" ]; then
+		local user="$DOAS_USER"
+	else
+		local user=$(whoami)
+	fi
+	chown "$user":"$user" -R "$DESTINATION/$NAME"
+}
+
+close() {
+	local label="$(get_label $1)"
+
+	umount -v "$DESTINATION/$label"
+	rmdir "$DESTINATION/$label"
+
+	cryptsetup close "$label"
+}
+
+setup() {
+	local partition="$1"
+	local label="$(get_label $1)"
+
+	read -s -p "Enter passphrase for $partition: " password
+
+	cryptsetup luksFormat "$partition" <<< "$password"
+	echo "cryptsetup: LUKS partition initialized on $partition"
+
+	cryptsetup open "$partition" "$label" <<< "$password"
+
+	mkfs.ext4 -q "/dev/mapper/$label"
+	echo "mke2fs: ext4 filesystem created on /dev/mapper/$label"
+
+	udevadm settle --timeout=10
+	cryptsetup close "$label"
+}
+
+case "$VERB" in
+	open) open "$PARTITION" ;;
+	close) close "$PARTITION" ;;
+	setup) setup "$PARTITION" ;;
+	*) print_help ;;
 esac
