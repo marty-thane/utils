@@ -15,12 +15,12 @@ PARTITION="$2"
 
 print_help() {
 	echo "Usage: $CRYPT VERB PARTITION"
-	echo ""
+	echo
 	echo "Verbs:"
-	echo "  open   mount PARTITION to $DESTINATION/<label>"
-	echo "  close  unmount PARTITION previously mounted"
-	echo "  setup  run cryptsetup luksFormat on PARTITION"
-	echo ""
+	echo "  open   - mount PARTITION to $DESTINATION/<label>"
+	echo "  close  - unmount PARTITION previously mounted"
+	echo "  setup  - run cryptsetup luksFormat on PARTITION"
+	echo
 	echo "Root privileges are needed to run this script."
 	echo "Both sudo and doas are supported."
 }
@@ -79,5 +79,5 @@ case "$VERB" in
 	open) open "$PARTITION" ;;
 	close) close "$PARTITION" ;;
 	setup) setup "$PARTITION" ;;
-	*) print_help ;;
+	*) print_help; exit 1 ;;
 esac
