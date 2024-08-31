@@ -13,22 +13,22 @@ BLOCKLIST_SOURCE='https://raw.githubusercontent.com/StevenBlack/hosts/master/hos
 # BLOCKLIST_SOURCE='https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts'
 
 # Download blocklist if not available
-[ -f $BLOCKLIST ] ||  {
+[ -f "$BLOCKLIST" ] ||  {
 	echo "Downloading blocklist to '$BLOCKLIST'"
-	curl -s $BLOCKLIST_SOURCE > $BLOCKLIST
+	curl -s "$BLOCKLIST_SOURCE" > "$BLOCKLIST"
 }
 
 # Backup original hosts file if in place
-[ -f $HOSTS ] && [ ! -L $HOSTS ] && {
+[ -f "$HOSTS" ] && [ ! -L "$HOSTS" ] && {
 	echo "Moving original '$HOSTS' to '$HOSTS_BACKUP'"
-	mv $HOSTS $HOSTS_BACKUP
+	mv "$HOSTS" "$HOSTS_BACKUP"
 }
 
 # Light switch logic
-if [ -L $HOSTS ]; then
-	rm $HOSTS
+if [ -L "$HOSTS" ]; then
+	rm "$HOSTS"
 	echo "Removed '$HOSTS'"
 else
-	ln -s $BLOCKLIST $HOSTS
+	ln -s "$BLOCKLIST" "$HOSTS"
 	echo "Symlinked '$BLOCKLIST' to '$HOSTS'"
 fi
