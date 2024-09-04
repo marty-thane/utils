@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script wraps around XBPS package manager, shortening many often used
 # commands. Syntax is inspired by APT. Root privileges are needed for some

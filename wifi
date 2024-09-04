@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script wraps around nmcli and is used for managing wireless connections.
 # It saves user's time by shortening the commands. In case of connecting to an

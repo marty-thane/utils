@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script maps the first Wacom stylus device found to the primary screen
 # while preserving aspect ratio. It borrows from Tom Galvin's more

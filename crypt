@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script wraps around cryptsetup and is used to manage encrypted
 # partitions. Partitions are mounted to /media. In case of failure, it may be

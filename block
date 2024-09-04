@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script acts as an ad blocker by downloading a blocklist from the
 # internet and symlinking it to /etc/hosts. User then runs the script to toggle
@@ -9,13 +9,13 @@ set -e
 HOSTS="/etc/hosts"
 HOSTS_BACKUP="/etc/hosts.old"
 BLOCKLIST="/etc/hosts.blocklist"
-BLOCKLIST_SOURCE='https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts'
-# BLOCKLIST_SOURCE='https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts'
+# BLOCKLIST_SOURCE='https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts'
+BLOCKLIST_SOURCE='https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts'
 
-# Download blocklist if not available
-[ -f "$BLOCKLIST" ] ||  {
+# Download blocklist if not available or update it if the user wishes to
+[ ! -f "$BLOCKLIST" ] || [ "$1" = "-u" ] && {
 	echo "Downloading blocklist to '$BLOCKLIST'"
-	curl -s "$BLOCKLIST_SOURCE" > "$BLOCKLIST"
+	curl -sLo "$BLOCKLIST" "$BLOCKLIST_SOURCE"
 }
 
 # Backup original hosts file if in place
