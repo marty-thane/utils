@@ -1,9 +1,9 @@
 Utils
 =====
 
-This repository contains a collection of shell scripts I've written over the past
-few months to simplify certain administrative tasks. If you're using Linux as
-your daily driver, these might come in handy.
+This repository contains a collection of shell scripts I've written over the
+past few months to simplify certain administrative tasks. If you're using Linux
+as your daily driver, these might come in handy.
 
 Contents
 --------
